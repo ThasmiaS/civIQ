@@ -12,8 +12,8 @@ class EmbeddingEngine:
 
     def chunk_text(self, text: str, chunk_size: int = 500) -> List[str]:
         """
-        TODO: Implement real RecursiveCharacterTextSplitter logic via Langchain or custom code.
-        For now, here is a basic naive word chunker.
+        A basic naive word chunker. In the future this can be swapped 
+        with LangChain's RecursiveCharacterTextSplitter.
         """
         words = text.split()
         chunks = []
@@ -23,13 +23,6 @@ class EmbeddingEngine:
         return chunks
 
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
-        """
-        TODO: Uncomment actual fastembed logic once ready to download model local weights.
-        """
-        print(f"Simulating FastEmbed embedding generation for {len(texts)} chunks...")
-        
-        # embeddings = list(self.embedding_model.embed(texts))
-        # return [emb.tolist() for emb in embeddings]
-        
-        # Return dummy vector (384 zero-floats matching FastEmbed Schema)
-        return [[0.0] * 384 for _ in texts]
+        print(f"Generating FastEmbed vectors for {len(texts)} chunks...")
+        embeddings = list(self.embedding_model.embed(texts))
+        return [emb.tolist() for emb in embeddings]

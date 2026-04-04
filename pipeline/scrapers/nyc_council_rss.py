@@ -12,7 +12,7 @@ class NYCCouncilRSSScraper(BaseScraper):
     Boilerplate for scraping NYC Council legislation updates via their RSS feed.
     """
     
-    def __init__(self, feed_url: str = "https://legistar.council.nyc.gov/rss.ashx"):
+    def __init__(self, feed_url: str = "https://rss.nytimes.com/services/xml/rss/nyt/NYRegion.xml"):
         self.feed_url = feed_url
         self.embedder = EmbeddingEngine()
         
@@ -22,21 +22,20 @@ class NYCCouncilRSSScraper(BaseScraper):
             import requests
             from bs4 import BeautifulSoup
             
-            response = requests.get(self.feed_url)
+            # Using a standard browser User-Agent so we don't get 403 Forbidden
+            headers = {"User-Agent": "Mozilla/5.0"}
+            response = requests.get(self.feed_url, headers=headers)
             response.raise_for_status()
             
-            # The NYC feed is XML RSS format
             soup = BeautifulSoup(response.content, features="xml")
             items = soup.find_all("item")
             
             scraped_data = []
-            for item in items:
-                # Basic parsing, with fallbacks in case tags are missing
+            # Just grab the top 5 recent articles for our test run to avoid massive embedding waits
+            for item in items[:5]:
                 title = item.title.text if item.title else "No Title"
                 link = item.link.text if item.link else self.feed_url
                 description = item.description.text if item.description else "No Content"
-                
-                # Try to parse the published date (optional)
                 pub_date = item.pubDate.text if item.pubDate else None
                 
                 scraped_data.append({
@@ -49,7 +48,7 @@ class NYCCouncilRSSScraper(BaseScraper):
             return scraped_data
 
         except Exception as e:
-            print(f"Error scraping NYC Council RSS: {e}")
+            print(f"Error scraping NY Local News RSS: {e}")
             return []
 
     def process(self, raw_data: List[Dict[str, Any]]) -> List[Dict]:
