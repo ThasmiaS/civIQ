@@ -8,7 +8,7 @@ Most residents don’t know:
 
 ❖ what policies exist  
 ❖ what their local representatives are actually voting on
-❖ how it affects their neighborhood and daily life  
+❖ how those decisions affect their neighborhood and daily life  
 ❖ what the impacts might be
 
 ## Architecture & Tech Stack
