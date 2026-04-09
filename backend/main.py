@@ -13,7 +13,10 @@ app = FastAPI(title="Civic Spiegel Backend API")
 # Configure CORS for Next.js localhost testing
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # For dev only (allow localhost:3000)
+    allow_origins=[
+        "https://civic-spiegel.vercel.app",
+        "http://localhost:3000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
