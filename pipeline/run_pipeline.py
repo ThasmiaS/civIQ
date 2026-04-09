@@ -1,7 +1,7 @@
 import sys
 from scrapers.gothamist_rss import GothamistRSSScraper
 from scrapers.nyc_council_meetings import NYCCouncilMeetingsScraper
-from scrapers.nyc_council_rss import NYCCouncilRSSScraper
+from scrapers.nyc_council_legistar import NYCCouncilLegistarScraper
 from scrapers.nys_senate_bills import NYSSenateBillsScraper
 from scrapers.nys_senate_transcripts import NYSSenateTranscriptsScraper
 
@@ -17,7 +17,7 @@ def run_full_pipeline():
     scrapers = [
         # GothamistRSSScraper(),  # Skip Gothamist for now as per user request to avoid 403s
         NYCCouncilMeetingsScraper(),
-        NYCCouncilRSSScraper(),
+        NYCCouncilLegistarScraper(),
         NYSSenateBillsScraper(),
         NYSSenateTranscriptsScraper(),
     ]
