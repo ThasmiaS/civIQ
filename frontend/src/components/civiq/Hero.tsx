@@ -1,21 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-function SkylineLayer({
-  scrollY,
-  speed,
-  className,
-}: {
-  scrollY: number;
-  speed: number;
-  className?: string;
-}) {
-  const y = scrollY * speed;
+function SkylineDecor({ className }: { className?: string }) {
   return (
     <div
       className={`pointer-events-none absolute inset-x-0 bottom-0 ${className ?? ""}`}
-      style={{ transform: `translate3d(0, ${y}px, 0)` }}
       aria-hidden
     >
       <svg
@@ -48,29 +36,22 @@ function SkylineLayer({
   );
 }
 
-export function Hero() {
-  const [scrollY, setScrollY] = useState(0);
+type HeroProps = {
+  query: string;
+  onQueryChange: (value: string) => void;
+  loading: boolean;
+  onSearch: () => void | Promise<void>;
+};
 
-  useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
+export function Hero({ query, onQueryChange, loading, onSearch }: HeroProps) {
   return (
     <section className="relative overflow-hidden pb-24 pt-10 sm:pb-32 sm:pt-16">
       <div
         className="pointer-events-none absolute -top-28 left-1/2 h-[480px] w-[min(920px,120vw)] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(167,139,250,0.2)_0%,rgba(91,127,163,0.12)_35%,transparent_68%)]"
-        style={{ transform: `translate3d(-50%, ${scrollY * 0.07}px, 0)` }}
         aria-hidden
       />
-      <SkylineLayer scrollY={scrollY} speed={0.11} />
-      <SkylineLayer
-        scrollY={scrollY}
-        speed={0.2}
-        className="text-[var(--accent-mid)] [&_svg]:opacity-45"
-      />
+      <SkylineDecor />
+      <SkylineDecor className="text-[var(--accent-mid)] [&_svg]:opacity-45" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <p className="font-display text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)] sm:text-xs">
@@ -84,9 +65,15 @@ export function Hero() {
           Location-aware policy briefings for NYC residents
         </p>
 
-        <div className="mt-12 max-w-2xl">
+        <form
+          className="mt-12 max-w-2xl"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void onSearch();
+          }}
+        >
           <label htmlFor="location-search" className="sr-only">
-            Enter neighborhood or ZIP code
+            Ask about your neighborhood, local policies, budgets, or city decisions
           </label>
           <div className="glass-card search-shell flex min-h-[3.75rem] items-center gap-3 rounded-2xl px-4 py-2 sm:gap-4 sm:px-5 sm:py-3 md:min-h-[4.25rem]">
             <span className="text-[var(--muted)]" aria-hidden>
@@ -107,17 +94,21 @@ export function Hero() {
               id="location-search"
               type="search"
               name="location"
-              placeholder="Enter neighborhood or ZIP code"
-              className="focus-soft min-w-0 flex-1 border-0 bg-transparent py-2 text-base text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-0 sm:text-[17px]"
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              placeholder="Ask about your neighborhood, local policies, budgets, or city decisions..."
+              disabled={loading}
+              className="focus-soft min-w-0 flex-1 border-0 bg-transparent py-2 text-base text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-0 enabled:cursor-text disabled:opacity-60 sm:text-[17px]"
             />
             <button
-              type="button"
-              className="btn-premium shrink-0 rounded-xl bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white sm:px-6 sm:text-[15px]"
+              type="submit"
+              disabled={loading || !query.trim()}
+              className="btn-premium shrink-0 rounded-xl bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white disabled:pointer-events-none disabled:opacity-50 sm:px-6 sm:text-[15px]"
             >
-              Search
+              {loading ? "Briefing…" : "Get briefing"}
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </section>
   );

@@ -47,75 +47,6 @@ body {
   font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Animated atmosphere blobs */
-.blob {
-  opacity: 0.72;
-  will-change: transform;
-}
-
-.blob-a {
-  animation: blob-drift-a 24s ease-in-out infinite;
-}
-
-.blob-b {
-  animation: blob-drift-b 28s ease-in-out infinite;
-}
-
-.blob-c {
-  animation: blob-drift-c 32s ease-in-out infinite;
-}
-
-.blob-d {
-  animation: blob-drift-d 20s ease-in-out infinite;
-  opacity: 0.55;
-}
-
-@keyframes blob-drift-a {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(5%, -6%) scale(1.06);
-  }
-  66% {
-    transform: translate(-4%, 4%) scale(0.97);
-  }
-}
-
-@keyframes blob-drift-b {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-6%, 5%) scale(1.04);
-  }
-}
-
-@keyframes blob-drift-c {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  40% {
-    transform: translate(4%, 6%) scale(1.05);
-  }
-  70% {
-    transform: translate(-5%, -3%) scale(0.96);
-  }
-}
-
-@keyframes blob-drift-d {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(8%, -4%);
-  }
-}
-
 /* Hero: animated gradient highlight */
 .hero-gradient-text {
   background: linear-gradient(
@@ -240,4 +171,9 @@ body {
   outline: none;
   box-shadow: 0 0 0 3px rgba(91, 127, 163, 0.22);
   border-radius: 0.75rem;
+}
+
+.prose-policy {
+  white-space: pre-wrap;
+  word-break: break-word;
 }

@@ -67,3 +67,6 @@ next-env.d.ts
 install_log*.txt
 run_log*.txt
 pip_list.txt
+
+**/.env.example
+**/.env.local

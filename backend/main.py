@@ -15,7 +15,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://civic-spiegel.vercel.app",
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://spieglo.vercel.app/"
     ],
     allow_credentials=True,
     allow_methods=["*"],
