@@ -60,7 +60,7 @@ next-env.d.ts
 # Pipeline
 **/.cache/
 **/pipeline/output/*.json
-!**/pipeline/output/mock_db.json
+**/pipeline/output/mock_db.json
 
 # Local Environment
 .env*
