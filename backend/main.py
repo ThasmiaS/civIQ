@@ -9,7 +9,12 @@ from embed import get_query_embedding
 from llm_engine import LLMEngine
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "pipeline"))
+
+# add pipeline directory to sys.path for cross-module imports
+pipeline_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "pipeline"))
+if pipeline_path not in sys.path:
+    sys.path.append(pipeline_path)
+
 from run_pipeline import run_full_pipeline
 
 app = FastAPI(title="Civic Spiegel Backend API")
