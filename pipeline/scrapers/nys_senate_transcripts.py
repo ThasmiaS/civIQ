@@ -38,8 +38,8 @@ class NYSSenateTranscriptsScraper(BaseScraper):
         self.embedder = EmbeddingEngine()
         self.classifier = TagClassifier()
 
-    def scrape(self) -> List[Dict[str, Any]]:
-        print(f"Fetching NYS Senate transcripts for {SESSION_YEAR}...")
+    def scrape(self, year: int = SESSION_YEAR) -> List[Dict[str, Any]]:
+        print(f"Fetching NYS Senate transcripts for {year}...")
         
         if not NYS_SENATE_API_KEY:
             print("  ✗ NYS_SENATE_API_KEY not found. Skipping NYS Senate Transcripts scraping.")
@@ -54,7 +54,7 @@ class NYSSenateTranscriptsScraper(BaseScraper):
             all_transcripts = []
 
             for t_type in transcript_types:
-                url = f"https://legislation.nysenate.gov/api/3/transcripts/{t_type}/{SESSION_YEAR}"
+                url = f"https://legislation.nysenate.gov/api/3/transcripts/{t_type}/{year}"
                 params = {"key": NYS_SENATE_API_KEY, "limit": 20}
                 
                 response = requests.get(url, params=params, headers=headers, timeout=15)
@@ -67,7 +67,7 @@ class NYSSenateTranscriptsScraper(BaseScraper):
                             item["_transcript_type"] = t_type
                         all_transcripts.extend(items)
                 else:
-                    print(f"  ✗ Failed to fetch {t_type} transcripts: {response.status_code}")
+                    print(f"  ✗ Failed to fetch {t_type} transcripts: {response.status_code} - {response.text}")
 
             print(f"  Fetched {len(all_transcripts)} transcript records total.")
             return all_transcripts
@@ -76,8 +76,8 @@ class NYSSenateTranscriptsScraper(BaseScraper):
             print(f"Error fetching NYS Senate transcripts: {e}")
             return []
 
-    def process(self, raw_data: List[Dict[str, Any]]) -> List[Dict]:
-        print("Processing NYS Senate transcripts...")
+    def process(self, raw_data: List[Dict[str, Any]], year: int = SESSION_YEAR) -> List[Dict]:
+        print(f"Processing NYS Senate transcripts for {year}...")
         processed = []
 
         for trans in raw_data:
@@ -96,7 +96,10 @@ class NYSSenateTranscriptsScraper(BaseScraper):
 
             title = f"NYS Senate {t_type.capitalize()} Transcript — {date_str}"
             
-            chunks_text = self.embedder.chunk_text(content)
+            # High-Density AI Summarization
+            summarized_content = self.embedder.summarize(content)
+            
+            chunks_text = self.embedder.chunk_text(summarized_content)
             vectors = self.embedder.generate_embeddings(chunks_text)
 
             document_chunks = []
@@ -111,6 +114,8 @@ class NYSSenateTranscriptsScraper(BaseScraper):
             ml_tags = self.classifier.classify(title, content)
             
             metadata = {
+                "transcript_date": date_str,
+                "session_year": year,
                 "transcript_type": t_type,
                 "location": location,
                 "jurisdiction": "NYS Legislature",
@@ -120,7 +125,7 @@ class NYSSenateTranscriptsScraper(BaseScraper):
 
             processed.append({
                 "title": title,
-                "source_url": f"https://www.nysenate.gov/transcripts/{t_type}/{SESSION_YEAR}/{date_str}",
+                "source_url": f"https://www.nysenate.gov/transcripts/{t_type}/{year}/{date_str}",
                 "source_type": "NYS Senate Transcript",
                 "published_date": trans.get("transcriptDate"),
                 "metadata_tags": metadata,
@@ -128,6 +133,21 @@ class NYSSenateTranscriptsScraper(BaseScraper):
             })
 
         return processed
+
+    def run(self, output_filename: str = "nys_senate_transcripts.json", use_json: bool = False, year: int = SESSION_YEAR):
+        print(f"Starting {self.__class__.__name__} for Year: {year}")
+        raw_data = self.scrape(year=year)
+        print(f"Scraped {len(raw_data)} items.")
+
+        parsed_items = self.process(raw_data, year=year)
+        print(f"Processed into {len(parsed_items)} clean documents.")
+
+        if use_json:
+            self.save_to_json(parsed_items, output_filename)
+        else:
+            self.save_to_db(parsed_items)
+
+        return parsed_items
 
 
 if __name__ == "__main__":

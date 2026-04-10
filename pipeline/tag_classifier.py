@@ -113,6 +113,33 @@ class TagClassifier:
             "entities": {k: list(v) for k, v in entities.items()}
         }
 
+    def is_high_signal(self, text: str) -> bool:
+        """
+        Determines if a chunk of text is worth storing or if it's 'procedural junk'.
+        A chunk is high signal if it matches at least one policy/demographic keyword,
+        or contains a politician's name.
+        """
+        text_lower = text.lower()
+        
+        # 1. Ignore common procedural/housekeeping phrases
+        junk_phrases = ["roll call", "adjourn", "meeting called to order", "minutes of the meeting", "housekeeping"]
+        if any(junk in text_lower for junk in junk_phrases) and len(text_lower) < 200:
+            return False
+
+        # 2. Check for policy/demographic signal
+        for categories in [self.POLICY_KEYWORDS, self.DEMOGRAPHIC_KEYWORDS]:
+            for keywords in categories.values():
+                if any(re.search(rf"\b{re.escape(kw)}\b", text_lower) for kw in keywords):
+                    return True
+        
+        # 3. Check for specific named entities (politicians/agencies)
+        if self.nlp:
+            doc = self.nlp(text[:2000])
+            if any(ent.label_ in ["PERSON", "ORG"] for ent in doc.ents):
+                return True
+                
+        return False
+
 if __name__ == "__main__":
     classifier = TagClassifier()
     sample_title = "NYC Council passes new rent stabilization bill"

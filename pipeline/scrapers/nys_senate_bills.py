@@ -37,8 +37,8 @@ class NYSSenateBillsScraper(BaseScraper):
         self.embedder = EmbeddingEngine()
         self.classifier = TagClassifier()
 
-    def scrape(self) -> List[Dict[str, Any]]:
-        print(f"Fetching NYS Senate bills for {SESSION_YEAR}...")
+    def scrape(self, year: int = SESSION_YEAR) -> List[Dict[str, Any]]:
+        print(f"Fetching NYS Senate bills for {year}...")
         
         if not NYS_SENATE_API_KEY:
             print("  ✗ NYS_SENATE_API_KEY not found. Skipping NYS Senate Bills scraping.")
@@ -46,7 +46,7 @@ class NYSSenateBillsScraper(BaseScraper):
 
         try:
             import requests
-            url = f"https://legislation.nysenate.gov/api/3/bills/{SESSION_YEAR}"
+            url = f"https://legislation.nysenate.gov/api/3/bills/{year}"
             params = {
                 "key": NYS_SENATE_API_KEY,
                 "limit": 50,
@@ -56,6 +56,9 @@ class NYSSenateBillsScraper(BaseScraper):
             
             headers = {"User-Agent": "CivicSpiegel/0.1; civic research bot"}
             response = requests.get(url, params=params, headers=headers, timeout=15)
+            if response.status_code != 200:
+                print(f"  ✗ Failed to fetch NYS Senate bills: {response.status_code} - {response.text}")
+                return []
             response.raise_for_status()
             
             data = response.json()
@@ -95,7 +98,10 @@ class NYSSenateBillsScraper(BaseScraper):
             # Date parsing
             pub_date = bill.get("publishedDateTime") or bill.get("approvalDate")
             
-            chunks_text = self.embedder.chunk_text(full_content)
+            # High-Density AI Summarization
+            summarized_content = self.embedder.summarize(full_content)
+            
+            chunks_text = self.embedder.chunk_text(summarized_content)
             vectors = self.embedder.generate_embeddings(chunks_text)
 
             document_chunks = []
@@ -111,6 +117,7 @@ class NYSSenateBillsScraper(BaseScraper):
             
             metadata = {
                 "bill_id": bill_id,
+                "session_year": year,
                 "jurisdiction": "NYS Legislature",
                 "sponsor": bill.get("sponsor", {}).get("member", {}).get("fullName"),
                 "status": bill.get("status", {}).get("statusDesc"),
@@ -120,7 +127,7 @@ class NYSSenateBillsScraper(BaseScraper):
 
             processed.append({
                 "title": f"NYS Bill {bill_id}: {title}",
-                "source_url": f"https://www.nysenate.gov/legislation/bills/{SESSION_YEAR}/{bill_id}",
+                "source_url": f"https://www.nysenate.gov/legislation/bills/{year}/{bill_id}",
                 "source_type": "NYS Legislation",
                 "published_date": pub_date,
                 "metadata_tags": metadata,
@@ -128,6 +135,21 @@ class NYSSenateBillsScraper(BaseScraper):
             })
 
         return processed
+
+    def run(self, output_filename: str = "nys_senate_bills.json", use_json: bool = False, year: int = SESSION_YEAR):
+        print(f"Starting {self.__class__.__name__} for Year: {year}")
+        raw_data = self.scrape(year=year)
+        print(f"Scraped {len(raw_data)} items.")
+
+        parsed_items = self.process(raw_data)
+        print(f"Processed into {len(parsed_items)} clean documents.")
+
+        if use_json:
+            self.save_to_json(parsed_items, output_filename)
+        else:
+            self.save_to_db(parsed_items)
+
+        return parsed_items
 
 
 if __name__ == "__main__":
