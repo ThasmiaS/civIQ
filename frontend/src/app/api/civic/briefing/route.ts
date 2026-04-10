@@ -2,15 +2,21 @@ import { NextResponse } from "next/server";
 
 import {
   getUpstreamApiUrl,
+  misconfiguredBackendResponse,
   upstream404Hint,
 } from "@/lib/backend-internal";
 
 /** Vercel: allow slow Render cold starts / HuggingFace + RAG latency */
 export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const UPSTREAM_TIMEOUT_MS = 55_000;
 
 export async function POST(request: Request) {
+  const mis = misconfiguredBackendResponse();
+  if (mis) return mis;
+
   const body = await request.text();
   const url = getUpstreamApiUrl("chat");
 

@@ -48,6 +48,53 @@ export function getUpstreamApiUrl(route: UpstreamRoute): string {
   return `${base}${path}`;
 }
 
+/**
+ * On Vercel, avoid confusing "Not Found" responses when the backend env points at
+ * localhost (the default) or at this same deployment's hostname.
+ */
+export function misconfiguredBackendResponse(): Response | null {
+  if (process.env.VERCEL !== "1") return null;
+
+  const raw =
+    process.env.API_INTERNAL_BASE_URL?.trim() ||
+    process.env.BACKEND_URL?.trim() ||
+    process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ||
+    "";
+
+  const effective =
+    (raw || "http://127.0.0.1:8000").replace(/\/+$/, "");
+
+  if (/127\.0\.0\.1|localhost/i.test(effective)) {
+    return new Response(
+      JSON.stringify({
+        detail:
+          "API_INTERNAL_BASE_URL is missing or still points at localhost. On Vercel, set API_INTERNAL_BASE_URL (or BACKEND_URL) to your public FastAPI origin, e.g. https://your-api.onrender.com — not 127.0.0.1.",
+      }),
+      { status: 502, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
+  try {
+    const backendHost = new URL(
+      effective.startsWith("http") ? effective : `https://${effective}`,
+    ).hostname.toLowerCase();
+    const vercelHost = process.env.VERCEL_URL?.trim().toLowerCase();
+    if (vercelHost && backendHost === vercelHost) {
+      return new Response(
+        JSON.stringify({
+          detail:
+            "API_INTERNAL_BASE_URL must be your FastAPI server URL (e.g. Render), not this site's Vercel URL. The frontend only exposes /api/civic/*; FastAPI serves /api/health and /api/chat on the backend host.",
+        }),
+        { status: 502, headers: { "Content-Type": "application/json" } },
+      );
+    }
+  } catch {
+    /* ignore */
+  }
+
+  return null;
+}
+
 /** Explains common 404s when the proxy reaches the wrong host or double-/api paths. */
 export function upstream404Hint(triedUrl: string): string {
   const vercelHost = process.env.VERCEL_URL?.trim();

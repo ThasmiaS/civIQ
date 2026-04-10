@@ -61,6 +61,7 @@ def get_db_context(query: str, top_k: int = 5) -> List[Dict]:
 
 
 @app.post("/api/chat")
+@app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
    """
    Core RAG endpoint.
@@ -89,6 +90,7 @@ async def chat_endpoint(request: ChatRequest):
 
 
 @app.get("/api/health")
+@app.get("/health")
 async def health_check():
    try:
        with Session(engine) as session:

@@ -2,15 +2,21 @@ import { NextResponse } from "next/server";
 
 import {
   getUpstreamApiUrl,
+  misconfiguredBackendResponse,
   upstream404Hint,
 } from "@/lib/backend-internal";
 
 /** Vercel: allow slow Render cold starts / first embedding download */
 export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const UPSTREAM_TIMEOUT_MS = 55_000;
 
 export async function GET() {
+  const mis = misconfiguredBackendResponse();
+  if (mis) return mis;
+
   const url = getUpstreamApiUrl("health");
   let upstream: Response;
   try {
