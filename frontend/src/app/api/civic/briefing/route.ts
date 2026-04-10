@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import {
   getUpstreamApiUrl,
   misconfiguredBackendResponse,
-  upstream404Hint,
+  upstream404Detail,
 } from "@/lib/backend-internal";
 
 /** Vercel: allow slow Render cold starts / HuggingFace + RAG latency */
@@ -14,12 +14,14 @@ export const runtime = "nodejs";
 const UPSTREAM_TIMEOUT_MS = 55_000;
 
 export async function POST(request: Request) {
+  
   const mis = misconfiguredBackendResponse();
   if (mis) return mis;
 
   const body = await request.text();
   const url = getUpstreamApiUrl("chat");
-
+  console.log("Upstream URL:", url);
+  
   let upstream: Response;
   try {
     upstream = await fetch(url, {
@@ -37,11 +39,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const text = await upstream.text();
   if (upstream.status === 404) {
-    return NextResponse.json({ detail: upstream404Hint(url) }, { status: 502 });
+    return NextResponse.json(
+      { detail: upstream404Detail(url, upstream) },
+      { status: 502 },
+    );
   }
 
+  const text = await upstream.text();
   return new NextResponse(text, {
     status: upstream.status,
     headers: {

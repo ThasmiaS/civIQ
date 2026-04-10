@@ -95,6 +95,28 @@ export function misconfiguredBackendResponse(): Response | null {
   return null;
 }
 
+/**
+ * When upstream returns 404, prefer a specific explanation (e.g. Render has no Web Service).
+ * Call before consuming `upstream` body. Falls back to `upstream404Hint`.
+ */
+export function upstream404Detail(triedUrl: string, upstream: Response): string {
+  const renderRouting =
+    upstream.headers.get("x-render-routing")?.trim().toLowerCase() ?? "";
+  if (renderRouting === "no-server") {
+    try {
+      const origin = new URL(triedUrl).origin;
+      return [
+        `Render reports no web service for ${origin} (HTTP 404, x-render-routing: no-server).`,
+        "Open the Render dashboard: confirm this hostname matches your FastAPI Web Service, resume if suspended, and verify a recent deploy succeeded.",
+        "This is not a missing /api/health route — the request did not reach your app process.",
+      ].join(" ");
+    } catch {
+      /* fall through */
+    }
+  }
+  return upstream404Hint(triedUrl);
+}
+
 /** Explains common 404s when the proxy reaches the wrong host or double-/api paths. */
 export function upstream404Hint(triedUrl: string): string {
   const vercelHost = process.env.VERCEL_URL?.trim();

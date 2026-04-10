@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import {
   getUpstreamApiUrl,
   misconfiguredBackendResponse,
-  upstream404Hint,
+  upstream404Detail,
 } from "@/lib/backend-internal";
 
 /** Vercel: allow slow Render cold starts / first embedding download */
@@ -35,11 +35,14 @@ export async function GET() {
     );
   }
 
-  const text = await upstream.text();
   if (upstream.status === 404) {
-    return NextResponse.json({ detail: upstream404Hint(url) }, { status: 502 });
+    return NextResponse.json(
+      { detail: upstream404Detail(url, upstream) },
+      { status: 502 },
+    );
   }
 
+  const text = await upstream.text();
   return new NextResponse(text, {
     status: upstream.status,
     headers: {
