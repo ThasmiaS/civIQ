@@ -49,28 +49,22 @@ class NYSSenateTranscriptsScraper(BaseScraper):
             import requests
             headers = {"User-Agent": "CivicSpiegel/0.1; civic research bot"}
             
-            # We fetch both floor sessions and public hearings
-            transcript_types = ["floor", "public-hearing"]
-            all_transcripts = []
+            headers = {"User-Agent": "CivicSpiegel/0.1; civic research bot"}
+            url = f"https://legislation.nysenate.gov/api/3/transcripts/{year}"
+            params = {"key": NYS_SENATE_API_KEY, "limit": 40}
+            
+            response = requests.get(url, params=params, headers=headers, timeout=15)
+            if response.status_code == 200:
+                data = response.json()
+                if data and "result" in data and "items" in data["result"]:
+                    items = data["result"]["items"]
+                    print(f"  Fetched {len(items)} transcript records total.")
+                    return items
+            else:
+                print(f"  ✗ Failed to fetch transcripts: {response.status_code} - {response.text}")
+                return []
 
-            for t_type in transcript_types:
-                url = f"https://legislation.nysenate.gov/api/3/transcripts/{t_type}/{year}"
-                params = {"key": NYS_SENATE_API_KEY, "limit": 20}
-                
-                response = requests.get(url, params=params, headers=headers, timeout=15)
-                if response.status_code == 200:
-                    data = response.json()
-                    if data and "result" in data and "items" in data["result"]:
-                        items = data["result"]["items"]
-                        # Tag them by type
-                        for item in items:
-                            item["_transcript_type"] = t_type
-                        all_transcripts.extend(items)
-                else:
-                    print(f"  ✗ Failed to fetch {t_type} transcripts: {response.status_code} - {response.text}")
-
-            print(f"  Fetched {len(all_transcripts)} transcript records total.")
-            return all_transcripts
+            return []
 
         except Exception as e:
             print(f"Error fetching NYS Senate transcripts: {e}")
@@ -81,7 +75,7 @@ class NYSSenateTranscriptsScraper(BaseScraper):
         processed = []
 
         for trans in raw_data:
-            t_type = trans.get("_transcript_type", "unknown")
+            t_type = trans.get("transcriptType", "unknown")
             date_str = trans.get("transcriptDate", "Unknown Date")
             location = trans.get("location", "NYS Senate Chamber")
             
@@ -125,7 +119,7 @@ class NYSSenateTranscriptsScraper(BaseScraper):
 
             processed.append({
                 "title": title,
-                "source_url": f"https://www.nysenate.gov/transcripts/{t_type}/{year}/{date_str}",
+                "source_url": f"https://www.nysenate.gov/transcripts/{year}/{date_str}",
                 "source_type": "NYS Senate Transcript",
                 "published_date": trans.get("transcriptDate"),
                 "metadata_tags": metadata,

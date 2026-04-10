@@ -50,7 +50,7 @@ class NYSSenateBillsScraper(BaseScraper):
             params = {
                 "key": NYS_SENATE_API_KEY,
                 "limit": 50,
-                "sort": "desc",
+                "sort": "publishedDateTime:DESC",
                 "offset": 0
             }
             
@@ -72,8 +72,8 @@ class NYSSenateBillsScraper(BaseScraper):
             print(f"Error fetching NYS Senate bills: {e}")
             return []
 
-    def process(self, raw_data: List[Dict[str, Any]]) -> List[Dict]:
-        print("Processing NYS Senate bill records...")
+    def process(self, raw_data: List[Dict[str, Any]], year: int = SESSION_YEAR) -> List[Dict]:
+        print(f"Processing NYS Senate bill records for {year}...")
         processed = []
 
         for bill in raw_data:
@@ -141,7 +141,7 @@ class NYSSenateBillsScraper(BaseScraper):
         raw_data = self.scrape(year=year)
         print(f"Scraped {len(raw_data)} items.")
 
-        parsed_items = self.process(raw_data)
+        parsed_items = self.process(raw_data, year=year)
         print(f"Processed into {len(parsed_items)} clean documents.")
 
         if use_json:

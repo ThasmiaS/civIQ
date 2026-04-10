@@ -54,7 +54,7 @@ class NYCCouncilLegistarScraper(BaseScraper):
             url = f"{LEGISTAR_BASE_URL}/Matters"
             params = {
                 "$top": limit,
-                "$orderby": "MatterLastModifiedDate desc",
+                "$orderby": "MatterLastModifiedUtc desc",
                 "token": NYC_COUNCIL_API_KEY
             }
             response = requests.get(url, params=params, headers={"User-Agent": "CivicSpiegel/0.1"}, timeout=15)
