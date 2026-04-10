@@ -329,7 +329,7 @@ CivicAnalysis/
 | | **[BE]** Implement `pgvector` cosine similarity search in `/api/chat` | BE | ✅ |
 | | Add `metadata_tags` classification to `process()` (policy area, demographics) | ML | ✅ |
 | | Improve chunking + overlap (sentence-aware) | ML | ✅ |
-| | OnboardingModal → save to `localStorage` | FE | ⏳ Pending |
+| | OnboardingModal → save to `localStorage` | FE | ✅ |
 | | Personalization toggle + Advanced Filters on Dashboard | FE | ⏳ Pending |
 | | Connect Politician Cards & Omnibus breakdown components to DB APIs | FE | ⏳ Pending |
 | **Apr 24** | *Buffer week — continue previous tasks* | ALL | ⏳ Pending |
