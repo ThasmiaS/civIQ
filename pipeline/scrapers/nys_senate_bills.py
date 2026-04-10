@@ -77,7 +77,6 @@ class NYSSenateBillsScraper(BaseScraper):
         processed = []
 
         for bill in raw_data:
-            print(bill)
             # The NYS Senate API returns items which might be bills or resolutions
             bill_id = bill.get("printNo", "unknown")
             title = bill.get("title", f"NYS Bill {bill_id}")
