@@ -75,6 +75,7 @@ class NYSSenateTranscriptsScraper(BaseScraper):
         processed = []
 
         for trans in raw_data:
+            session_type = trans.get("sessionType", "session")
             t_type = trans.get("transcriptType", "unknown")
             date_str = trans.get("transcriptDate", "Unknown Date")
             location = trans.get("location", "NYS Senate Chamber")
@@ -116,7 +117,7 @@ class NYSSenateTranscriptsScraper(BaseScraper):
 
             processed.append({
                 "title": title,
-                "source_url": f"https://www.nysenate.gov/transcripts/{year}/{date_str}",
+                "source_url": f"https://www.nysenate.gov/transcripts/{year}/{date_str}/{session_type}",
                 "source_type": "NYS Senate Transcript",
                 "published_date": trans.get("transcriptDate"),
                 "metadata_tags": metadata,
