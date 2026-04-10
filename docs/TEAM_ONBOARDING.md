@@ -11,6 +11,7 @@
 - **Database:** Neon Serverless Postgres + `pgvector`. The schema is defined in `backend/schema.py` using SQLModel. (Provisioned & Live).
 - **Data & Pipeline:** Automated Python scrapers running on **GitHub Actions** (7GB RAM Muskcle).
 - **Embeddings:** FastEmbed (`BAAI/bge-small-en-v1.5`) via ONNX on Github Actions. (Finalized).
+- **AI Summarization Layer:** Groq API (**Llama 3.1 8B**) used as a high-density pre-processor to condense verbose records.
 - **LLM:** Groq API (`llama-3.1-8b-instant`) for fast, free inference. (Active).
 
 ## 2. Current Development Environment
@@ -58,6 +59,9 @@ python -m scrapers.nyc_council_meetings --json
 python -m scrapers.nyc_council_legistar --json
 python -m scrapers.nys_senate_bills --json
 python -m scrapers.nys_senate_transcripts --json
+
+# Run a full multi-year historical backfill (2021-2026):
+python backfill_history.py --json
 ```
 Output JSON files are saved to `pipeline/output/`.
 

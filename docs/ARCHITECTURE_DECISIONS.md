@@ -45,7 +45,7 @@ This documentation is designed to be easily referenced for academic project defe
   * **Unified Architecture:** A single database handles BOTH relational tabular data (e.g., Council Member profiles, legislation metadata) and non-relational vector embeddings side-by-side.
   * **Referential Integrity:** We can write real SQL joins (e.g., "give me all `DocumentChunk`s linked to `PolicyDocument`s linked to `LegislationEvent`s voted on by Politician X") - something pure vector DBs cannot do.
   * Neon offers a generous free tier requiring no credit card, perfectly aligning with our $0 budget constraints.
-* **Current Status:** **[ACTIVE]** Neon Postgres is the primary storage engine. ALL data (relational metadata and vector embeddings) is persisted via `pgvector` in the cloud instance.
+* **Current Status:** **[ACTIVE]** Neon Postgres is the primary storage engine. ALL data (relational metadata and vector embeddings) is persisted via `pgvector` in the cloud instance. We use **`halfvec` (16-bit)** storage for vectors to cut storage footprint by 50%, enabling years of historical data to fit within the 512MB free tier limit.
 
 ---
 
@@ -140,3 +140,14 @@ Given the NYC/NYS civic domain (see `DOMAINS_AND_NUANCES.md`), our scraping prio
   * **Stability First:** GitHub Actions provides a 7GB RAM environment for free. By moving the "Muscle" (Python Pipeline) to GitHub, we ensure the "Heart" (FastAPI Backend) remains active and responsive on Render.
   * **Simplified Security:** We removed the trigger endpoints from `main.py` entirely, resolving the OOM risk by decoupling completely and removing the need for internal security tokens.
 * **Current Status:** **[ACTIVE]** Automated pipeline runs on GitHub Actions.
+
+---
+
+## 13. High-Density Civic Storage (Signal Discovery)
+**Decision:** AI-Powered Summarization + Semantic Junk Filtering
+* **Rationale:** As we expanded from "Latest 10 bills" to "8 Years of History," we hit the storage constraints of the Neon Free Tier. 
+* **The Solution:** 
+    * **Summarization:** Use Groq (Llama 3.1 8B) to condense verbose transcripts into fact-heavy briefings. 
+    * **Filtering:** A `is_high_signal` detector discards procedural noise (roll calls, adjournments, housekeeping).
+    * **Results:** This "Lossy Compression for RAG" allows us to store ~10x more historical years than raw ingestion, while improving LLM response accuracy by removing irrelevant filler text.
+* **Current Status:** **[ACTIVE]** Integrated into `BaseScraper` and all production scrapers.

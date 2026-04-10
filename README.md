@@ -18,8 +18,8 @@ Civic Spiegel guarantees un-biased, fact-checked RAG summaries without compromis
 
 * **Frontend:** Next.js + TypeScript + Tailwind (Zero-auth: demographic queries stay localized in `localStorage` ensuring absolute privacy).
 * **Backend API:** FastAPI (Python) running on Render.
-* **Database:** Neon Serverless PostgreSQL with `pgvector` for instant semantic similarity mapping via 5 normalized SQLModel tables.
-* **Embeddings & LLM:** Llama-3.1-8B (Groq) for lightning-fast inference, processing contexts generated locally via `fastembed` (BAAI/bge-small-en-v1.5).
+* **Database:** Neon Serverless PostgreSQL with with `pgvector` for instant semantic similarity mapping via 5 normalized SQLModel tables (**`halfvec` (16-bit)** for optimal storage density across years of historical data).
+* **Embeddings & LLM:** Llama-3.1-8B (Groq) for lightning-fast inference, processing contexts generated via `fastembed` (BAAI/bge-small-en-v1.5) with an **AI Summarization Layer** that condenses verbose transcripts into fact-rich briefings.
 * **Orchestration:** **GitHub Actions** handles the high-RAM data pipeline, while **cron-job.org** handles backend keep-alive pings.
 
 ## 🏛️ Comprehensive Jurisdictional Coverage
@@ -76,6 +76,9 @@ cp .env.example .env  # Fill in your keys
 cd backend
 pip install -r requirements.txt
 python init_db.py  # Initialize Neon tables
+
+# 3. Populate Historical Data (required for context)
+python pipeline/backfill_history.py 
 ```
 
 #### Automated Pipeline (GitHub Actions)
