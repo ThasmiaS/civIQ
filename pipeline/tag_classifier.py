@@ -37,13 +37,21 @@ class TagClassifier:
         "NYS Legislature": ["albany", "senate", "assembly", "governor", "state law", "nys senate", "nys assembly", "legislative", "capitol"],
     }
 
+    _model_cache = {}
+
     def __init__(self, model: str = "en_core_web_sm"):
-        try:
-            self.nlp = spacy.load(model)
-            print(f"TagClassifier initialized with spaCy model: {model}")
-        except Exception as e:
-            print(f"Warning: Could not load spaCy model {model}. NER will be disabled. Error: {e}")
-            self.nlp = None
+        # Singleton pattern: prevent loading the same spaCy model multiple times
+        if model not in TagClassifier._model_cache:
+            try:
+                print(f"Loading spaCy model into memory: {model}...")
+                TagClassifier._model_cache[model] = spacy.load(model)
+            except Exception as e:
+                print(f"Warning: Could not load spaCy model {model}. NER will be disabled. Error: {e}")
+                TagClassifier._model_cache[model] = None
+        
+        self.nlp = TagClassifier._model_cache[model]
+        if self.nlp:
+            print(f"TagClassifier ready (shared instance) with model: {model}")
 
     def _keyword_match(self, text: str, keyword_dict: Dict[str, List[str]], threshold: int = 2) -> List[str]:
         """Returns categories where at least 'threshold' keywords match (case-insensitive)."""

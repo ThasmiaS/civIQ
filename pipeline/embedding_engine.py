@@ -8,13 +8,24 @@ class EmbeddingEngine:
     Handles text chunking and FastEmbed vector generation.
     Uses BAAI/bge-small-en-v1.5 (384-dim) via ONNX on CPU — no GPU required.
     """
+    _model_cache = {}
+
     def __init__(self, model_name: str = "BAAI/bge-small-en-v1.5"):
         self.model_name = model_name
-        # Use a local cache directory to avoid Temp folder issues
-        cache_dir = os.path.join(os.path.dirname(__file__), ".cache")
-        os.makedirs(cache_dir, exist_ok=True)
-        self.embedding_model = TextEmbedding(model_name=self.model_name, cache_dir=cache_dir)
-        print(f"EmbeddingEngine initialized with model: {self.model_name}")
+        
+        # Singleton pattern: check if model is already loaded in class cache
+        if model_name not in EmbeddingEngine._model_cache:
+            # Use a local cache directory to avoid Temp folder issues
+            cache_dir = os.path.join(os.path.dirname(__file__), ".cache")
+            os.makedirs(cache_dir, exist_ok=True)
+            
+            print(f"Loading Embedding model into memory: {self.model_name}...")
+            EmbeddingEngine._model_cache[model_name] = TextEmbedding(
+                model_name=self.model_name, cache_dir=cache_dir
+            )
+        
+        self.embedding_model = EmbeddingEngine._model_cache[model_name]
+        print(f"EmbeddingEngine ready (shared instance) for model: {self.model_name}")
 
     def chunk_text(self, text: str, chunk_size: int = 500, overlap: int = 50) -> List[str]:
         """
