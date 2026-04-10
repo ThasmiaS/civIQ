@@ -55,9 +55,7 @@ class BaseScraper(ABC):
         from sqlmodel import Session, select
         from db import engine
         from schema import PolicyDocument, DocumentChunk
-        from tag_classifier import TagClassifier
 
-        classifier = TagClassifier()
         inserted = 0
         skipped = 0
         failed = 0
@@ -71,19 +69,6 @@ class BaseScraper(ABC):
                 ).first()
 
                 if existing:
-                    skipped += 1
-                    continue
-
-                # High-Density Storage: Filter out low-signal items early
-                # We check the first few chunks for signal
-                has_signal = False
-                for chunk in item.get("chunks", []):
-                    if classifier.is_high_signal(chunk["text_content"]):
-                        has_signal = True
-                        break
-                
-                if not has_signal:
-                    print(f"  ℹ Skipping low-signal document: {item['title'][:50]}...")
                     skipped += 1
                     continue
 
@@ -144,16 +129,10 @@ class BaseScraper(ABC):
         filepath = os.path.join(output_dir, filename)
         
         # Filter for JSON too so local tests match DB behavior
-        from tag_classifier import TagClassifier
-        classifier = TagClassifier()
-        filtered_data = [
-            item for item in data 
-            if any(classifier.is_high_signal(c["text_content"]) for c in item.get("chunks", []))
-        ]
-        
+
         with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(filtered_data, f, indent=4, default=str)
-        print(f"Saved {len(filtered_data)} high-signal items to {filepath} (Filtered {len(data) - len(filtered_data)} low-signal items)")
+            json.dump(data, f, indent=4, default=str)
+        print(f"Saved {len(data)} items to {filepath}")
 
     # entrypoint 
 
