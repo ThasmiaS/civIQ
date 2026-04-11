@@ -74,7 +74,7 @@ class EmbeddingEngine:
             
         return chunks
 
-    def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
+    def generate_embeddings(self, texts: List[str], batch_size: int = 32) -> List[List[float]]:
         """
         Generates 384-dimension float vectors for each text chunk via FastEmbed.
         Returns an empty list if no texts provided.
@@ -82,6 +82,11 @@ class EmbeddingEngine:
         if not texts:
             return []
         print(f"Generating FastEmbed vectors for {len(texts)} chunk(s)...")
-        embeddings = list(self.embedding_model.embed(texts))
-        return [emb.tolist() for emb in embeddings]
+        all_embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
+            batch_embeddings = list(self.embedding_model.embed(batch))
+            all_embeddings.extend(emb.tolist() for emb in batch_embeddings)
+ 
+        return all_embeddings
     
