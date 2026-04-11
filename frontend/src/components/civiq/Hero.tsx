@@ -53,62 +53,75 @@ export function Hero({ query, onQueryChange, loading, onSearch }: HeroProps) {
       <SkylineDecor className="text-[var(--accent)] opacity-20" />
       <SkylineDecor className="text-[var(--accent-mid)] opacity-[0.08] translate-x-4 translate-y-2" />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <p className="font-display text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)] sm:text-xs">
-          Civic Spiegel
-        </p>
-        <h1 className="font-display mt-5 max-w-4xl text-[2.35rem] font-semibold leading-[1.06] tracking-tight text-[var(--foreground)] sm:text-5xl md:text-6xl lg:text-[4.15rem] lg:leading-[1.04]">
-          Understand Policies That Affect{" "}
-          <span className="hero-gradient-text">Your Neighborhood</span>
-        </h1>
-        <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--muted)] sm:text-xl">
-          Your AI-powered civic research assistant
-        </p>
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+        <div>
+          <p className="font-condensed text-sm font-semibold uppercase tracking-widest text-[var(--accent)]">
+            Civic Spiegel
+          </p>
+          <h1 className="font-sans mt-5 max-w-2xl text-[2.75rem] font-bold leading-[1.05] tracking-tight text-[var(--foreground)] sm:text-5xl md:text-6xl lg:text-[4.25rem]">
+            Understand Policies That Affect <span className="hero-gradient-text">Your Neighborhood</span>
+          </h1>
+          <p className="font-serif mt-6 max-w-xl text-lg leading-relaxed text-[var(--muted)] sm:text-xl">
+            Your AI-powered civic research assistant
+          </p>
 
-        <form
-          className="mt-12 max-w-2xl"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void onSearch();
-          }}
-        >
-          <label htmlFor="location-search" className="sr-only">
-            Ask about your neighborhood, local policies, budgets, or city decisions
-          </label>
-          <div className="glass-card search-shell flex min-h-[3.75rem] items-center gap-3 rounded-2xl px-4 py-2 sm:gap-4 sm:px-5 sm:py-3 md:min-h-[4.25rem]">
-            <span className="text-[var(--muted)]" aria-hidden>
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.65"
-                className="opacity-65"
+          <form
+            className="mt-10 max-w-full lg:max-w-md"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void onSearch();
+            }}
+          >
+            <label htmlFor="location-search" className="sr-only">
+              Ask about your neighborhood, local policies, budgets, or city decisions
+            </label>
+            <div className="glass-card search-shell flex min-h-[3.75rem] items-center gap-3 rounded-2xl px-4 py-2 sm:gap-4 sm:px-5 sm:py-3 md:min-h-[4.25rem]">
+              <span className="text-[var(--muted)]" aria-hidden>
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.65"
+                  className="opacity-65"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20l-4-4" strokeLinecap="round" />
+                </svg>
+              </span>
+              <input
+                id="location-search"
+                type="search"
+                name="location"
+                value={query}
+                onChange={(e) => onQueryChange(e.target.value)}
+                placeholder="Ask about your neighborhood, local policies..."
+                disabled={loading}
+                className="font-sans focus-soft min-w-0 flex-1 border-0 bg-transparent py-2 text-base text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-0 enabled:cursor-text disabled:opacity-60 sm:text-[17px]"
+              />
+              <button
+                type="submit"
+                disabled={loading || !query.trim()}
+                className="font-condensed btn-premium shrink-0 rounded-xl bg-[var(--accent)] px-5 py-3 text-[15px] tracking-wide uppercase font-semibold text-white disabled:pointer-events-none disabled:opacity-50 sm:px-6 sm:text-[16px]"
               >
-                <circle cx="11" cy="11" r="7" />
-                <path d="M20 20l-4-4" strokeLinecap="round" />
-              </svg>
-            </span>
-            <input
-              id="location-search"
-              type="search"
-              name="location"
-              value={query}
-              onChange={(e) => onQueryChange(e.target.value)}
-              placeholder="Ask about your neighborhood, local policies, budgets, or city decisions..."
-              disabled={loading}
-              className="focus-soft min-w-0 flex-1 border-0 bg-transparent py-2 text-base text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-0 enabled:cursor-text disabled:opacity-60 sm:text-[17px]"
-            />
-            <button
-              type="submit"
-              disabled={loading || !query.trim()}
-              className="btn-premium shrink-0 rounded-xl bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white disabled:pointer-events-none disabled:opacity-50 sm:px-6 sm:text-[15px]"
-            >
-              {loading ? "Briefing…" : "Get briefing"}
-            </button>
-          </div>
-        </form>
+                {loading ? "Briefing…" : "Get briefing"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div className="hidden lg:flex justify-end items-center drop-shadow-2xl opacity-95 hover:opacity-100 transition-opacity duration-500">
+          <img
+            src="/image2.png"
+            alt="Civic Spiegel Network"
+            className="w-full max-w-[540px] xl:max-w-[620px] object-contain scale-[1.05]"
+            style={{
+              WebkitMaskImage: "radial-gradient(circle at center, black 40%, transparent 75%)",
+              maskImage: "radial-gradient(circle at center, black 40%, transparent 75%)"
+            }}
+          />
+        </div>
       </div>
     </section>
   );

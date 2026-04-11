@@ -8,6 +8,9 @@ import { NeighborhoodInsights } from "@/components/civiq/NeighborhoodInsights";
 import { MapPanel } from "@/components/civiq/MapPanel";
 import { RecentUpdates } from "@/components/civiq/RecentUpdates";
 import { SiteFooter } from "@/components/civiq/SiteFooter";
+import { OnboardingModal } from "@/components/civiq/OnboardingModal";
+import { DashboardFilters } from "@/components/civiq/DashboardFilters";
+import { useProfile } from "@/lib/useProfile";
 import {
   checkHealth,
   sendChat,
@@ -20,6 +23,19 @@ export function HomeShell() {
   const [error, setError] = useState<string | null>(null);
   const [response, setResponse] = useState<ChatResponse | null>(null);
   const [lastBriefingQuery, setLastBriefingQuery] = useState("");
+  
+  // Dashboard Filters State
+  const [selectedArea, setSelectedArea] = useState("All");
+  const [selectedLocation, setSelectedLocation] = useState("All NYC");
+  const [selectedTime, setSelectedTime] = useState("Last 30 Days");
+
+  const { profile, isLoaded, saveProfile } = useProfile();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Show onboarding on first load if profile doesn't exist
+  if (isLoaded && !profile && !showOnboarding && !localStorage.getItem("civic_profile_skipped")) {
+    setShowOnboarding(true);
+  }
 
   const handleSearch = async () => {
     const q = query.trim();
@@ -43,6 +59,19 @@ export function HomeShell() {
 
   return (
     <div className="relative flex min-h-full flex-1 flex-col">
+      <OnboardingModal 
+        isOpen={showOnboarding} 
+        initialProfile={profile}
+        onSave={(data) => {
+          saveProfile(data);
+          setShowOnboarding(false);
+        }}
+        onSkip={() => {
+          localStorage.setItem("civic_profile_skipped", "true");
+          setShowOnboarding(false);
+        }}
+      />
+
       <Header />
       <main className="relative z-10 flex-1">
         <Hero
@@ -50,6 +79,14 @@ export function HomeShell() {
           onQueryChange={setQuery}
           loading={loading}
           onSearch={handleSearch}
+        />
+        <DashboardFilters 
+          selectedArea={selectedArea} 
+          setSelectedArea={setSelectedArea} 
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+          selectedTime={selectedTime}
+          setSelectedTime={setSelectedTime}
         />
         <PolicyBriefingPanel
           loading={loading}
