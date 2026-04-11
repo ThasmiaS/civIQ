@@ -44,27 +44,45 @@ class NYSSenateTranscriptsScraper(BaseScraper):
         if not NYS_SENATE_API_KEY:
             print("  ✗ NYS_SENATE_API_KEY not found. Skipping NYS Senate Transcripts scraping.")
             return []
+        import requests
+        import time
+
+        headers = {"User-Agent": "CivicSpiegel/0.1; civic research bot"}
+        base_url = f"https://legislation.nysenate.gov/api/3/transcripts"
+        auth = {"key": NYS_SENATE_API_KEY}
 
         try:
-            import requests
-            headers = {"User-Agent": "CivicSpiegel/0.1; civic research bot"}
             
-            headers = {"User-Agent": "CivicSpiegel/0.1; civic research bot"}
-            url = f"https://legislation.nysenate.gov/api/3/transcripts/{year}"
-            params = {"key": NYS_SENATE_API_KEY, "limit": 40}
-            
-            response = requests.get(url, params=params, headers=headers, timeout=15)
-            if response.status_code == 200:
-                data = response.json()
-                if data and "result" in data and "items" in data["result"]:
-                    items = data["result"]["items"]
-                    print(f"  Fetched {len(items)} transcript records total.")
-                    return items
-            else:
-                print(f"  ✗ Failed to fetch transcripts: {response.status_code} - {response.text}")
-                return []
+            list_response = requests.get(
+                base_url, 
+                params={**auth, "limit": 40, "year": year}, 
+                headers=headers, 
+                timeout=15
+            )
 
-            return []
+            list_response.raise_for_status()
+            items = list_response.json().get("result", {}).get("items", [])
+            print(f"Listed {len(items)} transcripts. Fetching full text for each.")
+
+            # Fetch full text for each transcript
+            full_transcripts = []
+            for item in items:
+                date_time = item.get("dateTime")
+                if not date_time:
+                    continue
+
+                detail_response = requests.get(
+                    f"{base_url}/{date_time}",
+                    params=auth,
+                    headers=headers,
+                    timeout=15,
+                )
+                detail_response.raise_for_status()
+                full_transcripts.append(detail_response.json().get("result", {}))
+                time.sleep(0.2)  # rate limit
+
+            print(f"  Fetched {len(full_transcripts)} full transcripts.")
+            return full_transcripts
 
         except Exception as e:
             print(f"Error fetching NYS Senate transcripts: {e}")
@@ -81,13 +99,7 @@ class NYSSenateTranscriptsScraper(BaseScraper):
 
             # Transcripts in this API usually have multiple segments or a full text
             # We'll take the 'plainText' if available or concatenate segments
-            content = trans.get("plainText", "")
-            if not content and "sections" in trans:
-                content = "\n\n".join([s.get("text", "") for s in trans["sections"]])
-            
-            if not content:
-                content = f"Transcript for {t_type} session on {date_str}. Full text pending official publication."
-
+            content = trans.get("text", "")
             title = f"NYS Senate {t_type.capitalize()} Transcript — {date_str}"
             
             chunks_text = self.embedder.chunk_text(content)
