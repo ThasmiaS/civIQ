@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
-import { DM_Sans, Outfit } from "next/font/google";
+import { Inter, Khand, Atkinson_Hyperlegible } from "next/font/google";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const inter = Inter({
   variable: "--font-sans-body",
   subsets: ["latin"],
 });
 
-const outfit = Outfit({
-  variable: "--font-display",
+const khand = Khand({
+  weight: ["400", "600"],
+  variable: "--font-condensed",
+  subsets: ["latin"],
+});
+
+const atkinson = Atkinson_Hyperlegible({
+  weight: ["400", "700"],
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
@@ -26,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${outfit.variable} h-full antialiased`}
+      className={`${inter.variable} ${khand.variable} ${atkinson.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

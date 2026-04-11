@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=erode@400,600&display=swap');
 
 :root {
   --background: #eef2f6;
@@ -12,6 +13,8 @@
   --accent-rose: rgba(230, 57, 70, 0.15);
   --surface-glass: rgba(255, 255, 255, 0.85);
   --surface-glass-strong: rgba(255, 255, 255, 0.95);
+  --font-serif: 'Erode', ui-serif, Georgia, serif;
+  --font-display: 'Tanker', ui-sans-serif, system-ui, sans-serif;
 
   /* Layered shadows */
   --shadow-glass:
@@ -35,6 +38,10 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans-body);
+  --font-serif: var(--font-serif);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+  --font-condensed: var(--font-condensed);
 }
 
 body {
@@ -45,6 +52,18 @@ body {
 
 .font-display {
   font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-serif {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+}
+
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+.font-condensed {
+  font-family: var(--font-condensed), var(--font-sans-body), sans-serif;
 }
 
 /* Hero: animated gradient highlight */
@@ -174,4 +193,19 @@ body {
 .prose-policy {
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* Logo Clip from image2.png */
+.logo-clip {
+  background-image: url('/image2.png');
+  background-size: 600px;
+  background-position: center 52%;
+  background-repeat: no-repeat;
+  width: 38px;
+  height: 38px;
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background-color: white;
 }
