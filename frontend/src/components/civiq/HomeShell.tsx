@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/civiq/SiteFooter";
 import { OnboardingModal } from "@/components/civiq/OnboardingModal";
 import { DashboardFilters } from "@/components/civiq/DashboardFilters";
 import { useProfile } from "@/lib/useProfile";
+import { PoliticianCards } from "@/components/civiq/PoliticianCards";
 import {
   checkHealth,
   sendChat,
@@ -88,15 +89,24 @@ export function HomeShell() {
           selectedTime={selectedTime}
           setSelectedTime={setSelectedTime}
         />
-        <PolicyBriefingPanel
-          loading={loading}
-          error={error}
-          response={response}
-          briefingQuery={lastBriefingQuery}
-        />
+        <div id="briefings">
+          <PolicyBriefingPanel
+            loading={loading}
+            error={error}
+            response={response}
+            briefingQuery={lastBriefingQuery}
+          />
+        </div>
         <NeighborhoodInsights />
-        <MapPanel />
-        <RecentUpdates />
+        <div id="map">
+          <MapPanel />
+        </div>
+        <div id="politicians">
+          <PoliticianCards userBorough={profile?.borough} />
+        </div>
+        <div id="updates">
+          <RecentUpdates />
+        </div>
       </main>
       <SiteFooter />
     </div>

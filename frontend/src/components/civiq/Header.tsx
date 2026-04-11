@@ -21,13 +21,19 @@ export function Header() {
               Civic <span className="text-[var(--accent)]">Spiegel</span>
             </span>
           </Link>
-          <div className="flex items-center gap-4">
-            <p className="hidden font-condensed text-sm font-semibold tracking-wide uppercase text-[var(--muted)] sm:block">
-              NY Policy Assistant
+          <div className="flex items-center gap-6">
+            <nav className="hidden lg:flex items-center gap-5 text-[13px] font-semibold text-[var(--muted)] tracking-wide uppercase">
+              <a href="#briefings" className="hover:text-[var(--accent)] transition-colors">Briefings</a>
+              <a href="#map" className="hover:text-[var(--accent)] transition-colors">Map Insights</a>
+              <a href="#politicians" className="hover:text-[var(--accent)] transition-colors">Politicians</a>
+            </nav>
+            <div className="h-4 w-px bg-[var(--border)] hidden lg:block" />
+            <p className="hidden font-condensed text-sm font-bold tracking-wide uppercase text-[var(--accent-mid)] sm:block">
+              NY Data Sync
             </p>
-            <button
+            <button 
               onClick={() => setShowSettings(true)}
-              className="text-xs font-semibold text-[var(--accent)] border border-[var(--accent)]/30 rounded-full px-4 py-1.5 hover:bg-[var(--accent)] hover:text-white transition tracking-wide uppercase"
+              className="text-xs font-semibold text-white bg-[var(--accent)] rounded-full px-4 py-1.5 hover:bg-[var(--accent-mid)] transition tracking-wide uppercase shadow-sm"
             >
               Settings
             </button>
