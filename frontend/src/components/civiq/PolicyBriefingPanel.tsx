@@ -12,26 +12,29 @@ import { motion } from "framer-motion";
 import { MotionReveal, staggerContainer, staggerItem } from "./MotionReveal";
 import type { ChatResponse } from "@/lib/api";
 
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 const placeholderSections = [
   {
-    title: "Policy Summary",
-    body: "A proposed rezoning along the corridor would allow mid-rise housing where only light industrial uses exist today. The city is weighing affordable set-asides and infrastructure upgrades before a formal vote.",
-    Icon: FileText,
+    title: "Tracking Status",
+    body: "Hearing Scheduled",
+    Icon: CalendarClock,
   },
   {
-    title: "Key Stakeholders",
-    body: "Community Board 3, NYC Department of City Planning, local business improvement district, and tenant advocates have each submitted testimony. Council District 34’s office is hosting an additional listening session next month.",
-    Icon: Users,
-  },
-  {
-    title: "Potential Local Impacts",
-    body: "Nearby blocks could see increased construction activity, updated streetscape treatments, and revised loading rules. School capacity and transit crowding are flagged for follow-up analysis in the environmental assessment.",
+    title: "Key Zone",
+    body: "District 26 (Astoria)",
     Icon: Building2,
   },
   {
-    title: "Timeline",
-    body: "Scoping comments due · Public hearing (placeholder date) · Draft scope release · Expected land use vote window: late year (placeholder).",
-    Icon: CalendarClock,
+    title: "Vocal Stakeholders",
+    body: "CB3, DOT, Tenant Adv.",
+    Icon: Users,
+  },
+  {
+    title: "Impact Focus",
+    body: "Infrastructure, Housing",
+    Icon: FileText,
   },
 ] as const;
 
@@ -135,8 +138,10 @@ export function PolicyBriefingPanel({
                 <h3 className="font-display text-lg font-semibold text-[var(--foreground)]">
                   At a glance
                 </h3>
-                <div className="prose-policy mt-4 max-w-none text-[15px] leading-relaxed text-[var(--foreground)] sm:text-base">
-                  {reply}
+                <div className="prose-policy mt-4 max-w-none text-[15px] leading-relaxed text-[var(--foreground)] sm:text-base prose prose-slate">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {reply}
+                  </ReactMarkdown>
                 </div>
               </div>
 
@@ -206,44 +211,37 @@ export function PolicyBriefingPanel({
             </>
           ) : (
             <motion.div
-              className="mt-0 grid gap-10 sm:gap-12"
+              className="mt-0 grid gap-6"
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: "-40px" }}
               variants={staggerContainer}
             >
-              <div className="flex flex-wrap items-center gap-3 border-b border-[var(--border)] pb-6">
-                <span className="rounded-full bg-[linear-gradient(135deg,rgba(91,127,163,0.18)_0%,rgba(167,139,250,0.12)_100%)] px-3.5 py-1.5 text-xs font-semibold text-[var(--accent)] ring-1 ring-white/50">
-                  Sample briefing
-                </span>
-                <span className="text-sm text-[var(--muted)]">
-                  Astoria · ZIP 11103 · 2026-04-01
-                </span>
+              <div className="flex flex-wrap items-center justify-between border-b border-[var(--border)] pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="rounded-full bg-[var(--accent)] px-3.5 py-1.5 text-[11px] font-bold text-white uppercase tracking-widest shadow-sm">
+                    Sample Dashboard
+                  </span>
+                  <span className="text-sm font-semibold text-[var(--muted)]">
+                    Local Zone · 2026-04-01
+                  </span>
+                </div>
               </div>
-              {placeholderSections.map((s, i) => (
-                <motion.div key={s.title} variants={staggerItem}>
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/70 text-[var(--accent)] shadow-[0_2px_12px_-4px_rgba(91,127,163,0.2)] ring-1 ring-white/80">
-                      <s.Icon
-                        className="h-[1.125rem] w-[1.125rem]"
-                        strokeWidth={1.65}
-                        aria-hidden
-                      />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-display text-lg font-semibold text-[var(--foreground)]">
-                        {s.title}
-                      </h3>
-                      <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--muted)] sm:text-[15px]">
-                        {s.body}
-                      </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {placeholderSections.map((s, i) => (
+                  <motion.div key={s.title} variants={staggerItem} className="p-5 rounded-2xl border border-[var(--border)] bg-gray-50/50 flex flex-col justify-center transition hover:bg-white hover:shadow-sm">
+                    <div className="flex items-center gap-3 mb-2">
+                       <s.Icon className="h-5 w-5 text-[var(--accent)]" strokeWidth={1.75} />
+                       <h3 className="font-condensed text-[13px] font-bold tracking-widest text-[var(--muted)] uppercase">
+                         {s.title}
+                       </h3>
                     </div>
-                  </div>
-                  {i < placeholderSections.length - 1 ? (
-                    <div className="mt-10 h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
-                  ) : null}
-                </motion.div>
-              ))}
+                    <p className="font-sans text-lg font-semibold text-[var(--foreground)] leading-tight pl-8">
+                      {s.body}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
           )}
         </div>

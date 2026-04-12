@@ -9,9 +9,12 @@ export function SiteFooter() {
   return (
     <footer className="relative z-10 mt-16 border-t border-white/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.35)_0%,rgba(255,255,255,0.22)_100%)] py-12 shadow-[0_-8px_32px_-20px_rgba(91,127,163,0.08)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <p className="text-sm text-[var(--muted)]">
-          © {new Date().getFullYear()} civIQ · NYC civic clarity
-        </p>
+        <div className="flex items-center gap-3">
+          <span className="logo-clip w-[24px] h-[24px] bg-[length:400px] bg-[position:center_52%] opacity-80 border-0 shadow-none grayscale" />
+          <p className="font-condensed text-[13px] font-semibold tracking-wide uppercase text-[var(--muted)]">
+            © {new Date().getFullYear()} Civic Spiegel · NY Policy Assistant
+          </p>
+        </div>
         <nav className="flex flex-wrap gap-x-8 gap-y-3">
           {links.map((l) => (
             <a
