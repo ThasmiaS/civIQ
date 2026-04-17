@@ -35,6 +35,12 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${khand.variable} ${atkinson.variable} h-full antialiased`}
     >
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=erode@400,600&display=swap"
+        />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

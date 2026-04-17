@@ -4,16 +4,14 @@ import {
   Building2,
   CalendarClock,
   FileText,
+  Globe2,
   Lightbulb,
   ListChecks,
   Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { MotionReveal, staggerContainer, staggerItem } from "./MotionReveal";
-import type { ChatResponse } from "@/lib/api";
-
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import type { PolicyResponse } from "@/lib/api";
 
 const placeholderSections = [
   {
@@ -41,7 +39,7 @@ const placeholderSections = [
 type PolicyBriefingPanelProps = {
   loading: boolean;
   error: string | null;
-  response: ChatResponse | null;
+  response: PolicyResponse | null;
   briefingQuery: string;
 };
 
@@ -52,25 +50,31 @@ export function PolicyBriefingPanel({
   briefingQuery,
 }: PolicyBriefingPanelProps) {
   const showBriefing = Boolean(response && !loading);
+  const safe = {
+    at_a_glance: response?.at_a_glance ?? [],
+    key_takeaways: response?.key_takeaways ?? [],
+    what_this_means: response?.what_this_means ?? [],
+    relevant_actions: response?.relevant_actions ?? [],
+    sources: response?.sources ?? [],
+  };
 
-  const reply = response?.reply ?? "";
-  const sourcesCount =
-    response?.sources_used != null ? response.sources_used : undefined;
-
-  const futureSections = [
+  const structuredSections = [
     {
+      key: "key_takeaways",
       title: "Key takeaways",
-      body: reply,
+      items: safe.key_takeaways,
       Icon: Lightbulb,
     },
     {
+      key: "what_this_means",
       title: "What this means for you",
-      body: reply,
+      items: safe.what_this_means,
       Icon: Users,
     },
     {
+      key: "relevant_actions",
       title: "Relevant actions",
-      body: reply,
+      items: safe.relevant_actions,
       Icon: ListChecks,
     },
   ] as const;
@@ -138,38 +142,32 @@ export function PolicyBriefingPanel({
                 <h3 className="font-display text-lg font-semibold text-[var(--foreground)]">
                   At a glance
                 </h3>
-                <div className="prose-policy mt-4 max-w-none text-[15px] leading-relaxed text-[var(--foreground)] sm:text-base prose prose-slate">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {reply}
-                  </ReactMarkdown>
-                </div>
+                <ul className="mt-4 space-y-2 text-sm text-[var(--foreground)] sm:text-[15px]">
+                  {safe.at_a_glance.map((item, index) => (
+                    <li key={`glance-${index}`} className="flex gap-2 leading-relaxed">
+                      <span className="mt-1 text-[var(--accent)]">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
-              {sourcesCount != null ? (
+              {safe.sources.length > 0 ? (
                 <div className="mt-10 border-b border-[var(--border)] pb-10">
-                  <h3 className="font-display text-base font-semibold text-[var(--foreground)]">
+                  <h3 className="flex items-center gap-2 font-display text-base font-semibold text-[var(--foreground)]">
+                    <Globe2 className="h-4 w-4 text-[var(--accent)]" aria-hidden />
                     Sources
                   </h3>
-                  <p className="mt-2 text-sm text-[var(--muted)]">
-                    This briefing drew on{" "}
-                    <span className="font-medium text-[var(--foreground)]">
-                      {sourcesCount}
-                    </span>{" "}
-                    excerpt{sourcesCount === 1 ? "" : "s"} from indexed policy
-                    documents.
-                  </p>
-                  <ul className="mt-4 space-y-2 text-sm text-[var(--muted)]">
-                    {Array.from({ length: sourcesCount }, (_, i) => (
+                  <ul className="mt-4 space-y-3 text-sm text-[var(--muted)]">
+                    {safe.sources.map((source, i) => (
                       <li
                         key={i}
-                        className="flex gap-2 border-l-2 border-[var(--accent)]/25 pl-3"
+                        className="border-l-2 border-[var(--accent)]/25 pl-3"
                       >
-                        <span className="text-[var(--accent)]">
-                          {i + 1}.
-                        </span>
-                        <span>
-                          Policy document excerpt {i + 1} (corpus match)
-                        </span>
+                        <p className="font-semibold text-[var(--foreground)]">{source.title}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-[var(--muted)]">
+                          {source.description}
+                        </p>
                       </li>
                     ))}
                   </ul>
@@ -183,7 +181,7 @@ export function PolicyBriefingPanel({
                 viewport={{ once: true, margin: "-40px" }}
                 variants={staggerContainer}
               >
-                {futureSections.map((s, i) => (
+                {structuredSections.map((s, i) => (
                     <motion.div key={s.title} variants={staggerItem}>
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/70 text-[var(--accent)] shadow-[0_2px_12px_-4px_rgba(91,127,163,0.2)] ring-1 ring-white/80">
@@ -197,12 +195,17 @@ export function PolicyBriefingPanel({
                           <h3 className="font-display text-lg font-semibold text-[var(--foreground)]">
                             {s.title}
                           </h3>
-                          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--muted)] sm:text-[15px]">
-                            {s.body}
-                          </p>
+                          <ul className="mt-3 max-w-3xl space-y-2 text-sm leading-relaxed text-[var(--muted)] sm:text-[15px]">
+                            {s.items.map((item, itemIndex) => (
+                              <li key={`${s.key}-${itemIndex}`} className="flex gap-2">
+                                <span className="text-[var(--accent)]">•</span>
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
-                      {i < futureSections.length - 1 ? (
+                      {i < structuredSections.length - 1 ? (
                         <div className="mt-10 h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
                       ) : null}
                     </motion.div>

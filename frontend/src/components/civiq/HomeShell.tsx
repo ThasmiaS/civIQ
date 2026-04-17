@@ -15,14 +15,14 @@ import { PoliticianCards } from "@/components/civiq/PoliticianCards";
 import {
   checkHealth,
   sendChat,
-  type ChatResponse,
+  type PolicyResponse,
 } from "@/lib/api";
 
 export function HomeShell() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [response, setResponse] = useState<ChatResponse | null>(null);
+  const [response, setResponse] = useState<PolicyResponse | null>(null);
   const [lastBriefingQuery, setLastBriefingQuery] = useState("");
   
   // Dashboard Filters State

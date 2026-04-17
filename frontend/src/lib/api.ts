@@ -1,6 +1,12 @@
-export type ChatResponse = {
-  reply: string;
-  sources_used?: number;
+export type PolicyResponse = {
+  at_a_glance: string[];
+  key_takeaways: string[];
+  what_this_means: string[];
+  relevant_actions: string[];
+  sources: {
+    title: string;
+    description: string;
+  }[];
 };
 
 export type ChatExtra = {
@@ -34,17 +40,10 @@ export async function checkHealth(): Promise<HealthResponse> {
     cache: "no-store",
   });
 
-  const text = await res.text();
-  let json: HealthResponse & { detail?: string } = {};
-  try {
-    json = text ? (JSON.parse(text) as typeof json) : {};
-  } catch {
-    if (!res.ok) throw new Error(text || `Health check failed: ${res.status}`);
-    throw new Error("Invalid health response");
-  }
+  const json = (await res.json()) as HealthResponse & { detail?: string };
 
   if (!res.ok) {
-    throw new Error(json.detail || json.error || text || `HTTP ${res.status}`);
+    throw new Error(json.detail || json.error || `HTTP ${res.status}`);
   }
 
   return json;
@@ -53,7 +52,7 @@ export async function checkHealth(): Promise<HealthResponse> {
 export async function sendChat(
   query: string,
   extra?: ChatExtra,
-): Promise<ChatResponse> {
+): Promise<PolicyResponse> {
   const demographics = buildDemographics(extra);
 
   const body: { query: string; demographics?: Record<string, string> } = { query };
@@ -68,34 +67,73 @@ export async function sendChat(
     cache: "no-store",
   });
 
-  const text = await res.text();
-  let json: unknown;
-  try {
-    json = text ? JSON.parse(text) : null;
-  } catch {
-    throw new Error(text || `Invalid response (${res.status})`);
-  }
+  const data = (await res.json()) as unknown;
 
   if (!res.ok) {
     let message = `Request failed: ${res.status}`;
-    if (typeof json === "object" && json !== null && "detail" in json) {
-      const d = (json as { detail: unknown }).detail;
+    if (typeof data === "object" && data !== null && "detail" in data) {
+      const d = (data as { detail: unknown }).detail;
       if (typeof d === "string") message = d;
       else if (Array.isArray(d)) message = JSON.stringify(d);
-    } else if (text) {
-      message = text;
     }
     throw new Error(message);
   }
 
-  if (
-    json == null ||
-    typeof json !== "object" ||
-    !("reply" in json) ||
-    typeof (json as ChatResponse).reply !== "string"
-  ) {
-    throw new Error("Invalid chat response shape");
-  }
+  const payload: unknown =
+    typeof data === "object" &&
+    data !== null &&
+    "reply" in (data as Record<string, unknown>)
+      ? (data as { reply: unknown }).reply
+      : data;
 
-  return json as ChatResponse;
+  const safe: PolicyResponse = {
+    at_a_glance:
+      typeof payload === "object" &&
+      payload !== null &&
+      Array.isArray((payload as Record<string, unknown>).at_a_glance)
+        ? ((payload as Record<string, unknown>).at_a_glance as unknown[]).filter(
+            (item): item is string => typeof item === "string",
+          )
+        : [],
+    key_takeaways:
+      typeof payload === "object" &&
+      payload !== null &&
+      Array.isArray((payload as Record<string, unknown>).key_takeaways)
+        ? ((payload as Record<string, unknown>).key_takeaways as unknown[]).filter(
+            (item): item is string => typeof item === "string",
+          )
+        : [],
+    what_this_means:
+      typeof payload === "object" &&
+      payload !== null &&
+      Array.isArray((payload as Record<string, unknown>).what_this_means)
+        ? ((payload as Record<string, unknown>).what_this_means as unknown[]).filter(
+            (item): item is string => typeof item === "string",
+          )
+        : [],
+    relevant_actions:
+      typeof payload === "object" &&
+      payload !== null &&
+      Array.isArray((payload as Record<string, unknown>).relevant_actions)
+        ? ((payload as Record<string, unknown>).relevant_actions as unknown[]).filter(
+            (item): item is string => typeof item === "string",
+          )
+        : [],
+    sources:
+      typeof payload === "object" &&
+      payload !== null &&
+      Array.isArray((payload as Record<string, unknown>).sources)
+        ? ((payload as Record<string, unknown>).sources as unknown[])
+            .filter(
+              (item): item is { title: string; description: string } =>
+                typeof item === "object" &&
+                item !== null &&
+                typeof (item as Record<string, unknown>).title === "string" &&
+                typeof (item as Record<string, unknown>).description === "string",
+            )
+            .map((item) => ({ title: item.title, description: item.description }))
+        : [],
+  };
+
+  return safe;
 }
