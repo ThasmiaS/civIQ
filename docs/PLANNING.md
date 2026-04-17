@@ -70,11 +70,13 @@
 
 ### 4. Frontend (Next.js)
 - [x] Initial Next.js scaffolding with TypeScript + Tailwind
-- [ ] User Onboarding Modal (save to `localStorage`)
-- [ ] Advanced Filters Dashboard
-- [ ] Civic Assistant Chat Interface (calls `POST /api/chat`)
-- [ ] Politician / Omnibus Breakdown Cards
-- [ ] Settings page (clear `localStorage`)
+- [x] User Onboarding Modal (save to `localStorage`)
+- [x] Advanced Filters Dashboard (UI Layout)
+- [ ] Connect Dashboard to Live Data Fetching (Live filters)
+- [ ] Civic Assistant Chat Interface (Dedicated standalone page)
+- [ ] Politician / Omnibus Breakdown Cards (Live API integration)
+- [x] Settings page (clear `localStorage`)
+- [ ] Multi-page Navigation Migration (Next.js App Router)
 
 
 ## Big-Picture Scope
@@ -211,38 +213,33 @@
 
 ### 5. Politician Cards
 - Name, photo(?), district, party, role/years serving
-- Policy alignment scores (eg. Housing: 72% progressive, Healthcare: 2% conservative, etc.)
-- "What they said vs. what they voted" — council minute quotes vs. roll call record
-- Recent votes list (last 10 from `VoteRecord`)
-- Contact link + upcoming scheduled meetings
-
-- [ ] Option / Consideration: Basic Politician Cards & Omnibus Breakdowns
-    - Voting is nuanced (eg. omnibus bills often contain both good and bad provisions, etc). Package-level analysis (which policies are in a bill, how they split, who benefits, etc.)
-    - *Stretch* - only after core RAG pipeline is working
+- **Derived Policy Stances**: Inferred by LLM from bill sponsorship, voting patterns, and committee involvement (as stances are not provided via structured API).
+- "What they said vs. what they voted" — council minute quotes vs. roll call record.
+- Recent activity list (last 10 events from `LegislationEvent` / `VoteRecord`).
+- Contact link + upcoming scheduled meetings.
+- **Workflow**: Map Geography (ZIP/Districts) → Identify Officials → Pull Activity Signals.
 
 
 ### 6. Data Sources
 | Category | Examples |
 | --- | --- |
-| Legislation & minutes | City council minutes, ordinances, bills, agendas, PDF/HTML municipal records |
+| Legislation & minutes | City council minutes, ordinances, bills, agendas, NYC Council Legislative API (Legistar) |
+| NY State Data | NY State Senate Open Legislation API (near-real-time bills/activity) |
+| Geography & Boundaries | NYC Open Data (Boroughs/ZIPs), Redistricting Data Hub (District Maps) |
 | Budgets & finance | Published municipal budgets, budget hearings, line-item PDFs or CSVs |
 | Public datasets | Open Data portals, Census data, housing, crime, transportation, school stats |
-| Local news | RSS feeds, local newspaper sites, community blogs, press releases |
-| Government comms | Mayor's office releases, agency announcements, press conferences, transcripts |
-| User activity | Anonymous chat logs and click-throughs (only if explicitly consented) |
+| Local news | RSS feeds, local newspaper sites, Gothmist, community blogs |
+| Government comms | Mayor's office releases, press conferences, transcripts |
 
-
-#### Limited to NYC / NY:
-| Category | NYC / NY Data Source |
-| --- | --- |
-| NYC Open Data portal | https://opendata.cityofnewyork.us/ |
-| NYC Council meetings (1999–2024) | https://data.cityofnewyork.us/City-Government/City-Council-Meetings-1999-to-2024-/m48u-yjt8/about_data |
-| NYC Legislation (Legistar) | https://legistar.council.nyc.gov/Legislation.aspx |
-| NYC Expense Budget (by agency) | https://data.cityofnewyork.us/City-Government/Expense-Budget/mwzb-yiwb/about_data |
-| NYC City Council calendar / hearings | https://legistar.council.nyc.gov/Calendar.aspx |
-| NYC Council Budget Dashboards | https://council.nyc.gov/budget/dashboards/ |
-| NYC Open Data catalog | https://www.nyc.gov/site/designcommission/resources/designing-ny/open-data.page |
-| Local News | Use RSS feeds from local outlets (eg. NYT NYC section, Gothamist, local CUNY journalism projects, etc.) |
+#### Key API Sources for NYC / NY:
+| Source | Utility | Link |
+| --- | --- | ---|
+| NYC Open Data | Borough, Neighborhood, ZIP, and Community District boundaries | https://opendata.cityofnewyork.us/ |
+| NYC Council (Legistar) | Council members, bills, meetings, votes, legislative records | https://legistar.council.nyc.gov/ |
+| NY State Senate API | State Senate and Assembly bills, sponsors, committees, calendars | https://www.nysenate.gov/ |
+| Redistricting Data Hub | District boundary files (Congressional and State Legislative) | https://redistrictingdatahub.org/ |
+| NYC DCP / Geocoding | Mapping ZIP codes to relevant council/legislative districts | https://www.nyc.gov/site/planning/data-maps/open-data.page |
+| Local News | RSS feeds from curated outlets (Gothamist, NYT NYC) |  |
 
 
 ### 7. Data Pipeline: RAG & ML/LLM
@@ -267,7 +264,8 @@ scrape real sources → chunk → classify (metadata_tags) → FastEmbed embeddi
 
 
 ### 8. User Flow
-- USER → homepage → (Onboarding modal to localStorage) → [Dashboard | LLM chat | Politicians | Settings]
+- USER → homepage (Dashboard main draw) → (Onboarding modal to localStorage)
+- **Multi-page Architecture**: [/dashboard | /map | /politicians | /chat | /about | /data-sources]
     - Optional modal: "Help us show what matters to you."
     - Answer Qs / Skip 
     - App serializes filters to URL + localStorage
@@ -308,10 +306,10 @@ CivicAnalysis/
 | | Finalize MVP + Documentation (`ARCHITECTURE_DECISIONS`, `TEAM_ONBOARDING`, `DOMAINS_AND_NUANCES`) | PM | ✅ |
 | | Backend schema: 5-table DB schema (`backend/schema.py`) | PM, BE, ML | ✅ |
 | | FastAPI server setup (`backend/main.py`) with CORS | BE | ✅ |
-| | Github Setup `frontend/` (Next.js + TS + Tailwind) | FE | 🛠️ In Progress |
+| | Github Setup `frontend/` (Next.js + TS + Tailwind) | FE | ✅ |
 | **Apr 10** | Frontend structural layouts (Navigation, Modals, Forms) | FE | ⏳ Pending |
 | | ChatWindow component (LLM RAG Chat UI, calls `/api/chat`) | FE | ⏳ Pending |
-| | Dashboard UI skeleton + Settings modal | FE | ⏳ Pending |
+| | Dashboard UI skeleton + Settings modal | FE | ✅ |
 | | Groq LLM bridge + mock bypass (`backend/llm_engine.py`) | BE | ✅ |
 | | Data Pipeline Setup: Offline Mock DB (JSON Export) | ML | ✅ |
 | | Build initial scraper & FastEmbed engine framework | ML | ✅ |
@@ -323,27 +321,24 @@ CivicAnalysis/
 | | Activate real FastEmbed model in `embedding_engine.py` | ML | ✅ |
 | | Replace NYT RSS with real NYC data sources (Legistar / Open Data) | ML | ✅ |
 | | Set up Groq account + add `GROQ_API_KEY` to `.env` | BE | ✅ |
-| **Apr 17** | **[BE + ML BLOCKER]** Set up Neon Postgres + `DATABASE_URL` in `.env` | BE | ✅ |
-| | **[BE]** Run `init_db.py` to create tables in Neon | BE | ✅ |
-| | **[ML]** Build `save_to_postgres()` in `BaseScraper` (replaces `save_to_json`) | ML | ✅ |
-| | **[ML]** Run full pipeline: scrape → embed → push to Neon | ML | ✅ |
-| | **[BE]** Implement `pgvector` cosine similarity search in `/api/chat` | BE | ✅ |
-| | Add `metadata_tags` classification to `process()` (policy area, demographics) | ML | ✅ |
-| | Improve chunking + overlap (sentence-aware) | ML | ✅ |
-| | Filter junk placeholders explicitly via `is_junk_content` to preserve safe data | BE/ML | ✅ |
-| | Batch FastEmbed processing (`n=32`) to handle heavy 50+ page transcripts | BE/ML | ✅ |
-| | Standard Vector (384-bit) schema integration resolving `ndim` instantiation bugs | BE/ML | ✅ |
-| | OnboardingModal → save to `localStorage` | FE | ✅ |
-| | Personalization toggle + Advanced Filters on Dashboard | FE | ⏳ Pending |
-| | Connect Politician Cards & Omnibus breakdown components to DB APIs | FE | ⏳ Pending |
-| **Apr 24** | *Buffer week — continue previous tasks* | ALL | ⏳ Pending |
-| | Multi-language support, accessibility tweaks | FE | ⏳ Pending |
-| | Error handling, strict rate limiting | BE | ⏳ Pending |
+| **Apr 17** | **[BE + ML BLOCKER]** Neon Postgres + `pgvector` Integration | BE | ✅ |
+| | Full pipeline: scrape → embed → push to Neon | ML | ✅ |
 | | Create `GitHub Actions` orchestration for daily scraping pipeline | DevOps | ✅ |
-| | ~~Implement RAM Safety Guard for Render Free Tier~~ | DevOps | ✅ |
-| **May 01** | *Stretch Features* | ALL | ⏳ Pending |
-| | Connect Reranker feature (Voyage AI - stretch goal) | ML/BE | ⏳ Pending |
-| **May 08** | Working MVP end-to-end integration | ALL | ⏳ Pending |
+| | OnboardingModal + Dashboard Filters (UI) | FE | ✅ |
+| | Personalization toggle + Advanced Filters on Dashboard | FE | ✅ |
+| **Apr 23** | **CLASSROOM DEMO DEADLINE** | ALL | ⏳ Pending |
+| | Connect Dashboard to Live Data (Filters: Borough, Issue, Time) | FE | ⏳ Pending |
+| | Multi-page Migration: Separate routes for Map, Politicians, Chat, etc. | FE | ⏳ Pending |
+| | Politician Cards: Live data + activity signals | FE | ⏳ Pending |
+| | About Page: Project + 15s Demo Video | FE | ⏳ Pending |
+| | Map Geography Model: Borough, Neighborhood, ZIP-to-District mapping | BE/ML | ⏳ Pending |
+| **May 01** | **Interactive Map & Chatbot Polish** | ALL | ⏳ Pending |
+| | Interactive Map: Neighborhoods, Districts, Zip codes | FE | ⏳ Pending |
+| | LLM Chatbot - RAG + user context | FE | ⏳ Pending |
+| | [STRETCH] Error handling & Rate limiting for public demo | BE | ⏳ Pending |
+| | [STRETCH] Voyage AI Reranker integration | ML | ⏳ Pending |
+| | [STRETCH] Extensive WCAG AAA Accessibility Overhaul / Multi-language support | FE | ⏳ Pending |
+| **May 08** | **Working MVP end-to-end integration** | ALL | ⏳ Pending |
 | | QA, Testing, UI Polish | ALL | ⏳ Pending |
 | | All hosting live (Vercel / Render / Neon) | ALL | ✅ |
-| **May 15** | Final Projects and Demos Due | ALL | ⏳ Pending |
+| **May 15** | **Final Projects and Demos Due** | ALL | ⏳ Pending |
