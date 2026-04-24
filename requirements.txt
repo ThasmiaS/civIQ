@@ -20,4 +20,4 @@ requests>=2.31.0
 # Pipeline (scraping + NLP) 
 beautifulsoup4==4.12.3
 lxml>=5.2.1
-spacy>=3.7.0
+spacy==3.7.4
