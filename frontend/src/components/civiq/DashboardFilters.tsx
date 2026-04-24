@@ -18,7 +18,7 @@ export function DashboardFilters({
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-8">
       <div className="glass-card surface-float soft-inset rounded-3xl p-4 sm:p-5 flex flex-col md:flex-row gap-4 items-center justify-between border-[var(--border)]">
-        <div className="flex items-center gap-2 overflow-x-auto w-full pb-2 md:pb-0 scrollbar-hide py-1">
+        <div className="flex w-full flex-wrap items-center gap-2 py-1 md:pb-0">
           <span className="text-sm font-semibold text-[var(--muted)] mr-2 tracking-widest font-condensed uppercase shrink-0">Topic:</span>
           {POLICY_AREAS.map(area => (
             <button

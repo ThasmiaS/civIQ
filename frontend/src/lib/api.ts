@@ -39,8 +39,16 @@ export type PoliticianFilterOptions = {
   stances: string[];
 };
 
+export type OpenAiChatRole = "system" | "user" | "assistant";
+
+export type OpenAiChatMessage = {
+  role: OpenAiChatRole;
+  content: string;
+};
+
 
 const CIVIC_API = "/api/civic";
+const LLM_API = "/api/llm";
 
 function buildDemographics(extra?: ChatExtra): Record<string, string> {
   if (!extra) return {};
@@ -225,4 +233,52 @@ export async function getPoliticianFilters(): Promise<PoliticianFilterOptions> {
     : [];
 
   return { boroughs, stances };
+}
+
+export async function sendOpenAiChat(
+  messages: OpenAiChatMessage[],
+): Promise<OpenAiChatMessage> {
+  const safeMessages = messages
+    .filter((msg) => typeof msg.content === "string" && msg.content.trim().length > 0)
+    .map((msg) => ({ role: msg.role, content: msg.content.trim() }));
+
+  const res = await fetch(`${LLM_API}/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages: safeMessages }),
+    cache: "no-store",
+  });
+
+  const data = (await res.json()) as unknown;
+
+  if (!res.ok) {
+    let message = `Request failed: ${res.status}`;
+    if (typeof data === "object" && data !== null && "detail" in data) {
+      const d = (data as { detail: unknown }).detail;
+      if (typeof d === "string") message = d;
+      else if (Array.isArray(d)) message = JSON.stringify(d);
+    }
+    throw new Error(message);
+  }
+
+  if (
+    typeof data === "object" &&
+    data !== null &&
+    "message" in (data as Record<string, unknown>)
+  ) {
+    const message = (data as { message: unknown }).message;
+    if (
+      typeof message === "object" &&
+      message !== null &&
+      (message as Record<string, unknown>).role === "assistant" &&
+      typeof (message as Record<string, unknown>).content === "string"
+    ) {
+      return {
+        role: "assistant",
+        content: (message as Record<string, string>).content,
+      };
+    }
+  }
+
+  throw new Error("Invalid chat response shape.");
 }

@@ -217,23 +217,6 @@ export function PoliticianCards({ userBorough }: { userBorough?: string }) {
                     </p>
                   </div>
 
-                  {p.bio_url ? (
-                    <a
-                      href={p.bio_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex text-xs font-semibold text-[var(--accent)] hover:underline"
-                    >
-                      Official profile
-                    </a>
-                  ) : null}
-
-                  <p className="text-[11px] text-[var(--muted)]">
-                    Source:{" "}
-                    {p.data_source === "database"
-                      ? "Civic database"
-                      : "Seeded representative dataset"}
-                  </p>
                 </div>
               </motion.div>
             ))}

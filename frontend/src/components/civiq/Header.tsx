@@ -24,7 +24,6 @@ export function Header() {
           <div className="flex items-center gap-6">
             <nav className="hidden lg:flex items-center gap-5 text-[13px] font-semibold text-[var(--muted)] tracking-wide uppercase">
               <a href="#briefings" className="hover:text-[var(--accent)] transition-colors">Briefings</a>
-              <a href="#map" className="hover:text-[var(--accent)] transition-colors">Map Insights</a>
               <a href="#politicians" className="hover:text-[var(--accent)] transition-colors">Politicians</a>
             </nav>
             <div className="h-4 w-px bg-[var(--border)] hidden lg:block" />

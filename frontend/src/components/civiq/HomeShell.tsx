@@ -5,9 +5,6 @@ import dynamic from "next/dynamic";
 import { Header } from "@/components/civiq/Header";
 import { Hero } from "@/components/civiq/Hero";
 import { PolicyBriefingPanel } from "@/components/civiq/PolicyBriefingPanel";
-import { NeighborhoodInsights } from "@/components/civiq/NeighborhoodInsights";
-import { MapPanel } from "@/components/civiq/MapPanel";
-import { RecentUpdates } from "@/components/civiq/RecentUpdates";
 import { SiteFooter } from "@/components/civiq/SiteFooter";
 import { OnboardingModal } from "@/components/civiq/OnboardingModal";
 import { DashboardFilters } from "@/components/civiq/DashboardFilters";
@@ -147,15 +144,8 @@ export function HomeShell() {
           selectedTime={selectedTime}
         />
       )}
-        <NeighborhoodInsights />
-        <div id="map">
-          <MapPanel />
-        </div>
         <div id="politicians">
           <PoliticianCards userBorough={profile?.borough} />
-        </div>
-        <div id="updates">
-          <RecentUpdates />
         </div>
       </main>
       <SiteFooter />

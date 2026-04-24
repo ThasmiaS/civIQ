@@ -55,9 +55,6 @@ export function Hero({ query, onQueryChange, loading, onSearch }: HeroProps) {
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
         <div>
-          <p className="font-condensed text-sm font-semibold uppercase tracking-widest text-[var(--accent)]">
-            Civic Spiegel
-          </p>
           <h1 className="font-sans mt-5 max-w-2xl text-[2.75rem] font-bold leading-[1.05] tracking-tight text-[var(--foreground)] sm:text-5xl md:text-6xl lg:text-[4.25rem]">
             Understand Policies That Affect <span className="hero-gradient-text">Your Neighborhood</span>
           </h1>

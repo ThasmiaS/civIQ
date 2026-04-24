@@ -257,7 +257,7 @@ Instructions:
 
         {response && (
           <div className="mt-6 space-y-4">
-            <Section title="At a glance" items={response.at_a_glance} />
+            <Section title="Policy overview" items={response.at_a_glance} />
             <Section title="Key takeaways" items={response.key_takeaways} />
             <Section title="What this means" items={response.what_this_means} />
             <Section
