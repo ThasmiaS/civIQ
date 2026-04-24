@@ -165,7 +165,7 @@ export function PolicyBriefingPanel({
                 <p className="font-display text-lg font-semibold text-[var(--foreground)]">
                   Generating your policy briefing...
                 </p>
-                <p className="max-w-md text-sm text-[var(--muted)]">
+                <p className="max-w-md text-[15px] text-black">
                   Gathering relevant policy context and local insights.
                 </p>
               </motion.div>
@@ -188,11 +188,11 @@ export function PolicyBriefingPanel({
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/70 text-[var(--accent)] shadow-[0_2px_12px_-4px_rgba(91,127,163,0.2)] ring-1 ring-white/80">
                     <FileText className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.65} aria-hidden />
                   </span>
-                  <h3 className="font-display text-lg font-semibold text-[var(--foreground)]">
+                  <h3 className="text-[15px] font-semibold tracking-[0.08em] text-black">
                     Policy overview
                   </h3>
                 </div>
-                <ul className="mt-4 space-y-2 pl-[3.25rem] text-sm leading-relaxed text-[var(--foreground)] sm:text-[15px]">
+                <ul className="mt-4 space-y-2 pl-[3.25rem] text-[15px] leading-relaxed text-black">
                   {safe.at_a_glance.map((item, index) => (
                     <li key={`glance-${index}`} className="flex gap-2 leading-relaxed">
                       <span className="mt-1 text-[var(--accent)]">•</span>
@@ -220,10 +220,10 @@ export function PolicyBriefingPanel({
                           />
                         </span>
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-display text-lg font-semibold text-[var(--foreground)]">
+                          <h3 className="text-[15px] font-semibold tracking-[0.08em] text-black">
                             {s.title}
                           </h3>
-                          <ul className="mt-3 max-w-3xl space-y-2 text-sm leading-relaxed text-[var(--muted)] sm:text-[15px]">
+                          <ul className="mt-3 max-w-3xl space-y-2 text-[15px] leading-relaxed text-black">
                             {s.items.map((item, itemIndex) => (
                               <li key={`${s.key}-${itemIndex}`} className="flex gap-2">
                                 <span className="text-[var(--accent)]">•</span>
@@ -246,18 +246,18 @@ export function PolicyBriefingPanel({
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/70 text-[var(--accent)] shadow-[0_2px_12px_-4px_rgba(91,127,163,0.2)] ring-1 ring-white/80">
                       <Globe2 className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.65} aria-hidden />
                     </span>
-                    <h3 className="font-display text-lg font-semibold text-[var(--foreground)]">
+                    <h3 className="text-[15px] font-semibold tracking-[0.08em] text-black">
                       Sources
                     </h3>
                   </div>
-                  <ul className="mt-4 space-y-3 pl-[3.25rem] text-sm text-[var(--muted)] sm:text-[15px]">
+                  <ul className="mt-4 space-y-3 pl-[3.25rem] text-[15px] text-black">
                     {safe.sources.map((source, i) => (
                       <li
                         key={i}
                         className="border-l-2 border-[var(--accent)]/25 pl-3"
                       >
-                        <p className="font-semibold text-[var(--foreground)]">{source.title}</p>
-                        <p className="mt-1 text-sm leading-relaxed text-[var(--muted)] sm:text-[15px]">
+                        <p className="font-semibold text-black">{source.title}</p>
+                        <p className="mt-1 text-[15px] leading-relaxed text-black">
                           {source.description}
                         </p>
                       </li>

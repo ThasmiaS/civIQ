@@ -55,8 +55,10 @@ function Section({
 
   return (
     <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-sm">
-      <h3 className="mb-3 text-lg font-semibold text-slate-900">{title}</h3>
-      <ul className="space-y-2 text-sm text-slate-700">
+      <h3 className="mb-3 text-[15px] font-semibold tracking-[0.08em] text-black">
+        {title}
+      </h3>
+      <ul className="space-y-2 text-[15px] text-black">
         {items.map((item, index) => (
           <li key={`${title}-${index}`} className="ml-5 list-disc">
             {item}
@@ -267,22 +269,22 @@ Instructions:
 
             {sources.length > 0 && (
               <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-sm">
-                <h3 className="mb-3 text-lg font-semibold text-slate-900">
+                <h3 className="mb-3 text-[15px] font-semibold tracking-[0.08em] text-black">
                   Sources
                 </h3>
 
-                <div className="space-y-3 text-sm text-slate-700">
+                <div className="space-y-3 text-[15px] text-black">
                   {sources.map((source, index) => (
                     <div
                       key={`${source.title}-${index}`}
                       className="rounded-2xl border border-slate-200 p-3"
                     >
-                      <div className="font-medium text-slate-900">
+                      <div className="font-medium text-black">
                         {source.title}
                       </div>
 
                       {source.description && (
-                        <div className="mt-1 text-slate-600">
+                        <div className="mt-1 text-[15px] text-black">
                           {source.description}
                         </div>
                       )}
